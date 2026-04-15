@@ -36,7 +36,9 @@ jobs:
         run: |
           docker run -d -p 5000:5000 --name smoke-container smoke-test
           sleep 5
+          echo "===== CONTAINER LOGS ====="
           docker logs smoke-container
+          echo "===== CURL TEST ====="
           curl -f http://localhost:5000 || exit 1
 
       # 6. Cleanup container

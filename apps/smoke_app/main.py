@@ -6,4 +6,5 @@ def home():
     return "Smoke Test OK 🚀"
 
 if __name__ == "__main__":
+    print("Starting Flask app...")
     app.run(host="0.0.0.0", port=5000)
