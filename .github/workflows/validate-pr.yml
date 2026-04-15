@@ -11,8 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # 2. Set up Python (for future lint/tests)
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # 3. Install dependencies (optional for now)
+      - name: Install Dependencies
+        run: |
+          pip install flask
+
+      # 4. Build Docker Image
       - name: Build Docker Image
-        run: docker build -f devops/docker/DockerFile/dockerfile -t smoke-test .
+        run: |
+          docker build -f devops/docker/Dockerfile -t smoke-test .
+
+      # 5. Run container and test app (IMPORTANT)
+      - name: Run Smoke Test
+        run: |
+          docker run -d -p 5000:5000 --name smoke-container smoke-test
+          sleep 5
+          curl -f http://localhost:5000 || exit 1
+
+      # 6. Cleanup container
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop smoke-container || true
+          docker rm smoke-container || true
