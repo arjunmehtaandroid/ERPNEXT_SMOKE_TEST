@@ -15,33 +15,45 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 2. Set up Python (for future lint/tests)
+      # 2. Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      # 3. Install dependencies (optional for now)
+      # 3. Install dependencies
       - name: Install Dependencies
         run: |
-          pip install flask
+          pip install flask flake8 bandit
 
-      # 4. Build Docker Image
+      # 4. Run Lint (Code Quality)
+      - name: Run Lint (flake8)
+        run: |
+          flake8 apps/ --max-line-length=120
+
+      # 5. Run Security Scan (Bandit)
+      - name: Run Security Scan
+        run: |
+          bandit -r apps/
+
+      # 6. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -f devops/docker/Dockerfile/dockerfile -t smoke-test .
 
-      # 5. Run container and test app (IMPORTANT)
+      # 7. Run container and test app
       - name: Run Smoke Test
         run: |
           docker run -d -p 5000:5000 --name smoke-container smoke-test
           sleep 5
+
           echo "===== CONTAINER LOGS ====="
           docker logs smoke-container
+
           echo "===== CURL TEST ====="
           curl -f http://localhost:5000 || exit 1
 
-      # 6. Cleanup container
+      # 8. Cleanup
       - name: Cleanup
         if: always()
         run: |
