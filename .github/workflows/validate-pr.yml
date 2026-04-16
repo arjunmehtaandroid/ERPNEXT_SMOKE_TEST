@@ -25,31 +25,39 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install flask flake8 bandit
+      
+      # 4. Run Secret Scan Gitleaks    
+      - name: Run Secret Scan (Gitleaks)
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/repo ghcr.io/gitleaks/gitleaks:latest detect \
+          --source=/repo \
+          --verbose \
+          --redact
 
-      # 4. Run Lint (Code Quality)
+      # 5. Run Lint (Code Quality)
       - name: Run Lint (flake8)
         run: |
           flake8 apps/ --max-line-length=120
 
-      # 5. Run Security Scan (Bandit)
+      # 6. Run Security Scan (Bandit)
       - name: Run Security Scan
         run: |
           bandit -r apps/
       
-       # 6. Install test dependencies
+      # 7. Install test dependencies
       - name: Install Test Dependencies
         run: pip install pytest
       
-       # 7. Run Security Scan (Bandit) 
+      # 8. Run Security Scan (Bandit) 
       - name: Run Tests
         run: PYTHONPATH=. pytest    
 
-      # 8. Build Docker Image
+      # 9. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -f devops/docker/Dockerfile/dockerfile -t smoke-test .
 
-      # 9. Run container and test app
+      # 10. Run container and test app
       - name: Run Smoke Test
         run: |
           docker run -d -p 5000:5000 --name smoke-container smoke-test
@@ -61,7 +69,7 @@ jobs:
           echo "===== CURL TEST ====="
           curl -f http://localhost:5000 || exit 1
 
-      # 10. Cleanup
+      # 11. Cleanup
       - name: Cleanup
         if: always()
         run: |
