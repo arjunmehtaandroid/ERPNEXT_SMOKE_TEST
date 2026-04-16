@@ -42,7 +42,7 @@ jobs:
       
        # 7. Run Security Scan (Bandit) 
       - name: Run Tests
-        run: pytest    
+        run: PYTHONPATH=. pytest    
 
       # 8. Build Docker Image
       - name: Build Docker Image
