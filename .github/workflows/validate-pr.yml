@@ -35,13 +35,21 @@ jobs:
       - name: Run Security Scan
         run: |
           bandit -r apps/
+      
+       # 6. Install test dependencies
+      - name: Install Test Dependencies
+        run: pip install pytest
+      
+       # 7. Run Security Scan (Bandit) 
+      - name: Run Tests
+        run: pytest    
 
-      # 6. Build Docker Image
+      # 8. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -f devops/docker/Dockerfile/dockerfile -t smoke-test .
 
-      # 7. Run container and test app
+      # 9. Run container and test app
       - name: Run Smoke Test
         run: |
           docker run -d -p 5000:5000 --name smoke-container smoke-test
@@ -53,7 +61,7 @@ jobs:
           echo "===== CURL TEST ====="
           curl -f http://localhost:5000 || exit 1
 
-      # 8. Cleanup
+      # 10. Cleanup
       - name: Cleanup
         if: always()
         run: |
