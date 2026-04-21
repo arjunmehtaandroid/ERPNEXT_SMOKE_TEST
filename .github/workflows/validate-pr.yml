@@ -69,7 +69,7 @@ jobs:
           echo "===== CURL TEST ====="
           curl -f http://localhost:5000 || exit 1
 
-      # 11. Cleanup
+      # 11. Cleanup code and everything
       - name: Cleanup
         if: always()
         run: |
